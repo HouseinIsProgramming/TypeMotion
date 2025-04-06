@@ -9,6 +9,7 @@
 
 # production
 /build
+/out
 
 #dev only
 ./lib/google-font-options.ts
