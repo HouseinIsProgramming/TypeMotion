@@ -36,6 +36,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import SliderWithInput from "./slider-with-input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ColorPickerWithInput from "./color-picker-with-input";
+import { Textarea } from "./ui/textarea";
 
 // --- Helper Function to Load Google Fonts (remains the same) ---
 function loadGoogleFont(fontFamily: string, weight: string | number) {
@@ -143,7 +144,7 @@ export default function TextContainerControls({
           {/* {text input thingy} */}
           <div className="space-y-2">
             <Label htmlFor={`text-content-${container.id}`}>Text Content</Label>
-            <Input
+            <Textarea
               id={`text-content-${container.id}`}
               value={container.text}
               onChange={(e) => handleUpdate({ text: e.target.value })}
@@ -151,7 +152,7 @@ export default function TextContainerControls({
           </div>
           {/* {text input thingy end} */}
 
-          <div className="flex w-full gap-2 ">
+          <div className="flex w-full gap-2 flex-col md:flex-row">
             {/* --- Font Family Command Popover --- */}
             <div className="space-y-2 flex-grow basis-1/2">
               <Label>Font Family</Label>
