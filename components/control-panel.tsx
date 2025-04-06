@@ -2,11 +2,9 @@
 
 "use client";
 
-// --- ADD THESE IMPORTS ---
 import { useState, useRef, useEffect } from "react";
-import { Copy } from "lucide-react"; // Make sure Copy icon is imported
-// --- END ADDED IMPORTS ---
-
+import { Copy, Plus, Check } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -22,12 +20,12 @@ import type {
 } from "@/types/text-style-config";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { easingOptions } from "@/lib/options";
-import { Button } from "@/components/ui/button"; // Ensure Button is imported
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus } from "lucide-react"; // Ensure Plus is imported
 import TextContainerControls from "./text-container-controls";
 import SliderWithInput from "./slider-with-input";
 import ColorPickerWithInput from "./color-picker-with-input";
+import { cn } from "@/lib/utils";
 
 interface ControlPanelProps {
   config: TextStyleConfig;
@@ -47,13 +45,10 @@ export default function ControlPanel({
   updateTextContainer,
   removeTextContainer,
 }: ControlPanelProps) {
-  // --- ADD STATE and REF for Copy Button ---
   const [isCopying, setIsCopying] = useState(false);
   const [showCopySuccess, setShowCopySuccess] = useState(false);
   const copySuccessTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  // --- END ADDED STATE and REF ---
 
-  // --- Existing handlers (untouched) ---
   const updatePadding = (key: keyof typeof config.padding, value: number) => {
     updateConfig({
       padding: {
@@ -89,48 +84,38 @@ export default function ControlPanel({
       },
     });
   };
-  // --- End Existing handlers ---
 
-  // --- ADD EFFECT for Copy Timeout Cleanup ---
   useEffect(() => {
-    // Return cleanup function
     return () => {
       if (copySuccessTimeoutRef.current) {
         clearTimeout(copySuccessTimeoutRef.current);
       }
     };
-  }, []); // Empty dependency array ensures this runs only on mount and unmount
-  // --- END ADDED EFFECT ---
+  }, []);
 
-  // --- ADD HANDLER for Copying JSON ---
   const handleCopyJson = async () => {
-    // Clear any existing timeout before starting a new copy action
     if (copySuccessTimeoutRef.current) {
       clearTimeout(copySuccessTimeoutRef.current);
-      copySuccessTimeoutRef.current = null; // Reset ref
+      copySuccessTimeoutRef.current = null;
     }
-    setShowCopySuccess(false); // Ensure message is hidden initially if clicked again quickly
+    setShowCopySuccess(false);
     setIsCopying(true);
-    const jsonString = JSON.stringify(config, null, 2); // Pretty-print JSON
+    const jsonString = JSON.stringify(config, null, 2);
 
     try {
       await navigator.clipboard.writeText(jsonString);
-      setShowCopySuccess(true); // Show the success message
-      // Set a timeout to hide the message after 2 seconds
+      setShowCopySuccess(true);
       copySuccessTimeoutRef.current = setTimeout(() => {
         setShowCopySuccess(false);
-        copySuccessTimeoutRef.current = null; // Reset ref after timeout
-      }, 2000); // 2000 milliseconds = 2 seconds
+        copySuccessTimeoutRef.current = null;
+      }, 3000); // 3 seconds
     } catch (err) {
       console.error("Failed to copy settings: ", err);
-      // No failure notification shown inline as per requirement
     } finally {
       setIsCopying(false);
     }
   };
-  // --- END ADDED HANDLER ---
 
-  // --- Existing JSX Return starts here ---
   return (
     <div className="space-y-6">
       <Tabs defaultValue="text" className="w-full">
@@ -156,6 +141,7 @@ export default function ControlPanel({
           <Button
             onClick={addTextContainer}
             className="w-full flex items-center justify-center gap-2"
+            variant="outline"
           >
             <Plus className="h-4 w-4" />
             Add Text Container
@@ -164,13 +150,13 @@ export default function ControlPanel({
 
         <TabsContent value="style" className="space-y-4">
           <div className="flex flex-col md:flex-row gap-4 *:flex-grow *:basis-1/2">
-            <ColorPickerWithInput // light color selctor
+            <ColorPickerWithInput
               id="background-color"
               label="Background Color (Light)"
               value={config.backgroundColor}
               onChange={(value) => updateConfig({ backgroundColor: value })}
             />
-            <ColorPickerWithInput // dark color selctor
+            <ColorPickerWithInput
               id="background-color-dark"
               label="Background Color (Dark)"
               value={config.backgroundColorDark}
@@ -441,16 +427,20 @@ export default function ControlPanel({
             </>
           )}
         </TabsContent>
-      </Tabs>{" "}
-      {/* End Tabs component */}
-      {/* --- ADD THIS SECTION AT THE VERY BOTTOM --- */}
-      <div className="pt-4 border-t text-center">
-        {/* Conditional Success Message */}
+      </Tabs>
+
+      <div className="pt-4 border-t text-center relative">
         {showCopySuccess && (
-          <p className="text-sm text-green-600 mb-2 animate-pulse">Copied!</p>
+          <Card className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 border-green-500 bg-green-50 dark:bg-green-950 dark:border-green-700 shadow-lg w-auto whitespace-nowrap">
+            <CardContent className="p-2">
+              <div className="flex items-center justify-center gap-1.5 text-sm text-green-700 dark:text-green-400">
+                <Check className="h-4 w-4" />
+                <span>Copied!</span>
+              </div>
+            </CardContent>
+          </Card>
         )}
 
-        {/* The Copy Button */}
         <Button
           onClick={handleCopyJson}
           disabled={isCopying}
@@ -460,7 +450,6 @@ export default function ControlPanel({
           {isCopying ? "Copying..." : "Copy Settings JSON"}
         </Button>
       </div>
-      {/* --- END ADDED SECTION --- */}
-    </div> // End main wrapping div
+    </div>
   );
 }
