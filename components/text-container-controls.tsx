@@ -1,66 +1,67 @@
+// components/text-container-controls.tsx
+
 "use client";
 
-import { useEffect } from "react"; // Import useEffect for potential initial load
+import { useEffect, useState } from "react"; // Import useState
+import { Check, ChevronsUpDown, Trash2 } from "lucide-react"; // Import icons
+
+import { cn } from "@/lib/utils"; // Import cn utility
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"; // Import Command components
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"; // Import Popover components
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Select,
+  Select, // Keep Select for Font Weight
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import type { TextContainer } from "@/types/text-style-config";
-import { fontOptions, fontWeightOptions } from "@/lib/options";
-import { Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { fontOptions, fontWeightOptions } from "@/lib/options"; // Assuming fontOptions has { label: string, value: string }
 import { Card, CardContent } from "@/components/ui/card";
 import SliderWithInput from "./slider-with-input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ColorPickerWithInput from "./color-picker-with-input";
-// REMOVE: import { createGoogleFontsFetch } from "@frontlabsofficial/google-fonts-fetch";
 
-// REMOVE: const fetchGoogleFont = createGoogleFontsFetch();
-
-// --- Helper Function to Load Google Fonts ---
+// --- Helper Function to Load Google Fonts (remains the same) ---
 function loadGoogleFont(fontFamily: string, weight: string | number) {
   if (!fontFamily || !weight) {
     console.warn("Missing font family or weight for loading.");
     return;
   }
-
   const familyForUrl = fontFamily.replace(/ /g, "+");
-  // Assuming weight is always numeric here based on fontWeightOptions values
   const numericWeight =
     typeof weight === "string" ? parseInt(weight, 10) : weight;
-
-  // Create a unique ID for the link tag to prevent duplicates
-  // Note: This simple ID assumes non-italic for now. Add italic if needed.
   const fontId = `google-font-${familyForUrl}-${numericWeight}-normal`;
 
-  // Check if this specific font variation is already requested
   if (document.getElementById(fontId)) {
-    // console.log(`${fontFamily} (${numericWeight}) already loaded or requested.`);
     return;
   }
 
-  // Construct the Google Fonts API URL (v2)
-  // Basic implementation: Loads only the specified weight.
-  // Add italic handling or multiple weights if needed later.
   let apiUrl = `https://fonts.googleapis.com/css2?family=${familyForUrl}`;
-  apiUrl += `:wght@${numericWeight}`; // Request specific weight
-  apiUrl += "&display=swap"; // Recommended for performance
-
+  apiUrl += `:wght@${numericWeight}`;
+  apiUrl += "&display=swap";
   console.log(`Requesting Google Font: ${apiUrl}`);
 
-  // Create the <link> element
   const link = document.createElement("link");
-  link.id = fontId; // Add ID to check later
+  link.id = fontId;
   link.rel = "stylesheet";
   link.type = "text/css";
   link.href = apiUrl;
-
-  // Append the <link> element to the <head>
   document.head.appendChild(link);
 }
 // --- End Helper Function ---
@@ -81,35 +82,44 @@ export default function TextContainerControls({
   removeTextContainer,
   canRemove,
 }: TextContainerControlsProps) {
-  // --- Optional: Load initial font on mount ---
-  // If you want the font defined in the initial 'container' prop
-  // to be loaded when the component first renders.
+  // State for controlling the Popover's visibility
+  const [fontPopoverOpen, setFontPopoverOpen] = useState(false);
+
+  // --- Optional: Load initial font on mount (remains the same) ---
   useEffect(() => {
     if (container.fontFamily && container.fontWeight) {
       loadGoogleFont(container.fontFamily, container.fontWeight);
     }
-    // Run only once on mount, or when container ID changes if that's possible
-  }, [container.id]); // Adjust dependencies if needed, but often just mount is fine.
+  }, [container.id]);
   // --- End Optional Initial Load ---
 
   const handleUpdate = (updates: Partial<Omit<TextContainer, "id">>) => {
     updateTextContainer(container.id, updates);
   };
 
+  // This function is now called from the CommandItem's onSelect
   const handleFontFamilyChange = (newFontFamily: string) => {
-    // 1. Load the new font family (using the current weight)
-    loadGoogleFont(newFontFamily, container.fontWeight);
-    // 2. Update the state
-    handleUpdate({ fontFamily: newFontFamily });
+    // Check if it's actually a new font before loading/updating
+    if (newFontFamily && newFontFamily !== container.fontFamily) {
+      // 1. Load the new font family (using the current weight)
+      loadGoogleFont(newFontFamily, container.fontWeight);
+      // 2. Update the state
+      handleUpdate({ fontFamily: newFontFamily });
+    }
   };
 
+  // Handler for Font Weight (remains the same)
   const handleFontWeightChange = (newFontWeight: string) => {
-    // 1. Load the font family with the new weight
-    loadGoogleFont(container.fontFamily, newFontWeight); // Use current family
-    // 2. Update the state (ensure weight is stored correctly, e.g., as string or number)
-    // Assuming your state expects a string based on usage with Select value
-    handleUpdate({ fontWeight: newFontWeight });
+    if (newFontWeight && newFontWeight !== container.fontWeight.toString()) {
+      loadGoogleFont(container.fontFamily, newFontWeight);
+      handleUpdate({ fontWeight: newFontWeight });
+    }
   };
+
+  // Find the label for the currently selected font to display on the button
+  const selectedFontLabel =
+    fontOptions.find((font) => font.value === container.fontFamily)?.label ||
+    "Select font...";
 
   return (
     <Card className="mb-4">
@@ -130,6 +140,7 @@ export default function TextContainerControls({
         </div>
 
         <div className="space-y-4">
+          {/* ... (Text Content Input remains the same) ... */}
           <div className="space-y-2">
             <Label htmlFor={`text-content-${container.id}`}>Text Content</Label>
             <Input
@@ -139,32 +150,63 @@ export default function TextContainerControls({
             />
           </div>
 
+          {/* --- Font Family Command Popover --- */}
           <div className="space-y-2">
-            <Label htmlFor={`font-family-${container.id}`}>Font Family</Label>
-            <Select
-              value={container.fontFamily}
-              // Use the specific handler
-              onValueChange={handleFontFamilyChange}
-            >
-              <SelectTrigger id={`font-family-${container.id}`}>
-                <SelectValue placeholder="Select font" />
-              </SelectTrigger>
-              <SelectContent>
-                {fontOptions.map((font) => (
-                  <SelectItem key={font.value} value={font.value}>
-                    {font.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label>Font Family</Label>
+            <Popover open={fontPopoverOpen} onOpenChange={setFontPopoverOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={fontPopoverOpen}
+                  className="w-full justify-between font-normal" // Use font-normal so button text doesn't change font
+                >
+                  {selectedFontLabel}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                {" "}
+                {/* Use trigger width */}
+                <Command>
+                  <CommandInput placeholder="Search font..." />
+                  <CommandList>
+                    <CommandEmpty>No font found.</CommandEmpty>
+                    <CommandGroup>
+                      {fontOptions.map((font) => (
+                        <CommandItem
+                          key={font.value}
+                          value={font.value} // Value used for searching/matching
+                          onSelect={(currentValue) => {
+                            // currentValue is the 'value' of the selected item
+                            handleFontFamilyChange(currentValue);
+                            setFontPopoverOpen(false); // Close popover on select
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              container.fontFamily === font.value
+                                ? "opacity-100"
+                                : "opacity-0", // Show check only if selected
+                            )}
+                          />
+                          {font.label}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
+          {/* --- End Font Family Command Popover --- */}
 
+          {/* --- Font Weight Select (remains the same) --- */}
           <div className="space-y-2">
             <Label htmlFor={`font-weight-${container.id}`}>Font Weight</Label>
             <Select
-              // Ensure value is a string if handleUpdate expects string
               value={container.fontWeight.toString()}
-              // Use the specific handler
               onValueChange={handleFontWeightChange}
             >
               <SelectTrigger id={`font-weight-${container.id}`}>
@@ -172,7 +214,6 @@ export default function TextContainerControls({
               </SelectTrigger>
               <SelectContent>
                 {fontWeightOptions.map((weight) => (
-                  // Ensure weight.value is string if needed
                   <SelectItem
                     key={weight.value}
                     value={weight.value.toString()}
@@ -183,8 +224,9 @@ export default function TextContainerControls({
               </SelectContent>
             </Select>
           </div>
+          {/* --- End Font Weight Select --- */}
 
-          {/* ... (Rest of the controls: FontSize, Colors, Margins, Delay) ... */}
+          {/* ... (Rest of the controls: FontSize, Colors, Margins, Delay remain the same) ... */}
           <SliderWithInput
             id={`font-size-${container.id}`}
             label="Font Size"
@@ -197,6 +239,7 @@ export default function TextContainerControls({
           />
 
           <Tabs defaultValue="light" className="w-full">
+            {/* ... Tabs content ... */}
             <TabsList className="grid grid-cols-2 mb-2">
               <TabsTrigger value="light">Light Mode</TabsTrigger>
               <TabsTrigger value="dark">Dark Mode</TabsTrigger>
@@ -224,6 +267,7 @@ export default function TextContainerControls({
           <SliderWithInput
             id={`margin-top-${container.id}`}
             label="Margin Top"
+            // ... props
             min={0}
             max={64}
             step={1}
@@ -235,6 +279,7 @@ export default function TextContainerControls({
           <SliderWithInput
             id={`margin-bottom-${container.id}`}
             label="Margin Bottom"
+            // ... props
             min={0}
             max={64}
             step={1}
@@ -246,6 +291,7 @@ export default function TextContainerControls({
           <SliderWithInput
             id={`delay-${container.id}`}
             label="Animation Delay"
+            // ... props
             min={0}
             max={2}
             step={0.05}
