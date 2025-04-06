@@ -78,7 +78,7 @@ export default function ControlPanel({
 
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="animation" className="w-full">
+      <Tabs defaultValue="text" className="w-full">
         <TabsList className="grid grid-cols-3 mb-4">
           <TabsTrigger value="text">Text</TabsTrigger>
           <TabsTrigger value="style">Card</TabsTrigger>
@@ -108,32 +108,20 @@ export default function ControlPanel({
         </TabsContent>
 
         <TabsContent value="style" className="space-y-4">
-          <Tabs defaultValue="light" className="w-full">
-            <TabsList className="grid grid-cols-2 mb-2">
-              <TabsTrigger value="light">Light Mode</TabsTrigger>
-              <TabsTrigger value="dark">Dark Mode</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="light" className="space-y-4 pt-2">
-              <ColorPickerWithInput
-                id="background-color"
-                label="Background Color (Light)"
-                value={config.backgroundColor}
-                onChange={(value) => updateConfig({ backgroundColor: value })}
-              />
-            </TabsContent>
-
-            <TabsContent value="dark" className="space-y-4 pt-2">
-              <ColorPickerWithInput
-                id="background-color-dark"
-                label="Background Color (Dark)"
-                value={config.backgroundColorDark}
-                onChange={(value) =>
-                  updateConfig({ backgroundColorDark: value })
-                }
-              />
-            </TabsContent>
-          </Tabs>
+          <div className="flex flex-col md:flex-row gap-4 *:flex-grow *:basis-1/2">
+            <ColorPickerWithInput // light color selctor
+              id="background-color"
+              label="Background Color (Light)"
+              value={config.backgroundColor}
+              onChange={(value) => updateConfig({ backgroundColor: value })}
+            />
+            <ColorPickerWithInput // dark color selctor
+              id="background-color-dark"
+              label="Background Color (Dark)"
+              value={config.backgroundColorDark}
+              onChange={(value) => updateConfig({ backgroundColorDark: value })}
+            />
+          </div>
 
           <SliderWithInput
             id="border-radius"
