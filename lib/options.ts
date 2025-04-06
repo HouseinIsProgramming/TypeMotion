@@ -1,4 +1,6 @@
-export const fontOptions = [
+import moreFonts from "./moreFonts.json";
+
+export const fontDefaults = [
   { value: "Inter", label: "Inter" },
   { value: "Arial", label: "Arial" },
   { value: "Helvetica", label: "Helvetica" },
@@ -10,7 +12,11 @@ export const fontOptions = [
   { value: "Trebuchet MS", label: "Trebuchet MS" },
   { value: "Impact", label: "Impact" },
   { value: "Comic Sans MS", label: "Comic Sans MS" },
-]
+];
+
+const shorterList = moreFonts.slice(0, 300);
+
+export const fontOptions = [...shorterList];
 
 export const fontWeightOptions = [
   { value: "100", label: "100 (Thin)" },
@@ -24,7 +30,7 @@ export const fontWeightOptions = [
   { value: "900", label: "900 (Black)" },
   { value: "normal", label: "Normal" },
   { value: "bold", label: "Bold" },
-]
+];
 
 export const easingOptions = [
   { value: "linear", label: "Linear" },
@@ -38,11 +44,10 @@ export const easingOptions = [
   { value: "backOut", label: "Back Out" },
   { value: "backInOut", label: "Back In Out" },
   { value: "anticipate", label: "Anticipate" },
-]
+];
 
 export const staggerTypeOptions = [
   { value: "letter", label: "Letter" },
   { value: "word", label: "Word" },
   { value: "line", label: "Line" },
-]
-
+];
