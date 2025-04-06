@@ -1,23 +1,36 @@
-"use client"
+"use client";
 
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import type { TextStyleConfig, TextContainer, StaggerType } from "@/types/text-style-config"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { easingOptions } from "@/lib/options"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Plus } from "lucide-react"
-import TextContainerControls from "./text-container-controls"
-import SliderWithInput from "./slider-with-input"
-import ColorPickerWithInput from "./color-picker-with-input"
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type {
+  TextStyleConfig,
+  TextContainer,
+  StaggerType,
+} from "@/types/text-style-config";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { easingOptions } from "@/lib/options";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Plus } from "lucide-react";
+import TextContainerControls from "./text-container-controls";
+import SliderWithInput from "./slider-with-input";
+import ColorPickerWithInput from "./color-picker-with-input";
 
 interface ControlPanelProps {
-  config: TextStyleConfig
-  updateConfig: (updates: Partial<TextStyleConfig>) => void
-  addTextContainer: () => void
-  updateTextContainer: (id: string, updates: Partial<Omit<TextContainer, "id">>) => void
-  removeTextContainer: (id: string) => void
+  config: TextStyleConfig;
+  updateConfig: (updates: Partial<TextStyleConfig>) => void;
+  addTextContainer: () => void;
+  updateTextContainer: (
+    id: string,
+    updates: Partial<Omit<TextContainer, "id">>,
+  ) => void;
+  removeTextContainer: (id: string) => void;
 }
 
 export default function ControlPanel({
@@ -33,19 +46,25 @@ export default function ControlPanel({
         ...config.padding,
         [key]: value,
       },
-    })
-  }
+    });
+  };
 
-  const updateAnimation = (key: keyof typeof config.animation, value: string | number | boolean) => {
+  const updateAnimation = (
+    key: keyof typeof config.animation,
+    value: string | number | boolean,
+  ) => {
     updateConfig({
       animation: {
         ...config.animation,
         [key]: value,
       },
-    })
-  }
+    });
+  };
 
-  const updateStagger = (key: keyof typeof config.animation.stagger, value: string | number | boolean) => {
+  const updateStagger = (
+    key: keyof typeof config.animation.stagger,
+    value: string | number | boolean,
+  ) => {
     updateConfig({
       animation: {
         ...config.animation,
@@ -54,15 +73,15 @@ export default function ControlPanel({
           [key]: value,
         },
       },
-    })
-  }
+    });
+  };
 
   return (
     <div className="space-y-6">
       <Tabs defaultValue="animation" className="w-full">
         <TabsList className="grid grid-cols-3 mb-4">
           <TabsTrigger value="text">Text</TabsTrigger>
-          <TabsTrigger value="style">Style</TabsTrigger>
+          <TabsTrigger value="style">Card</TabsTrigger>
           <TabsTrigger value="animation">Animation</TabsTrigger>
         </TabsList>
 
@@ -79,7 +98,10 @@ export default function ControlPanel({
             ))}
           </div>
 
-          <Button onClick={addTextContainer} className="w-full flex items-center justify-center gap-2">
+          <Button
+            onClick={addTextContainer}
+            className="w-full flex items-center justify-center gap-2"
+          >
             <Plus className="h-4 w-4" />
             Add Text Container
           </Button>
@@ -106,7 +128,9 @@ export default function ControlPanel({
                 id="background-color-dark"
                 label="Background Color (Dark)"
                 value={config.backgroundColorDark}
-                onChange={(value) => updateConfig({ backgroundColorDark: value })}
+                onChange={(value) =>
+                  updateConfig({ backgroundColorDark: value })
+                }
               />
             </TabsContent>
           </Tabs>
@@ -174,9 +198,13 @@ export default function ControlPanel({
             <Checkbox
               id="animate-card"
               checked={config.animation.animateCard}
-              onCheckedChange={(checked) => updateAnimation("animateCard", checked === true)}
+              onCheckedChange={(checked) =>
+                updateAnimation("animateCard", checked === true)
+              }
             />
-            <Label htmlFor="animate-card">Animate Card (uncheck to animate text containers)</Label>
+            <Label htmlFor="animate-card">
+              Animate Card (uncheck to animate text containers)
+            </Label>
           </div>
 
           {!config.animation.animateCard && (
@@ -187,9 +215,13 @@ export default function ControlPanel({
                 <Checkbox
                   id="stagger-enabled"
                   checked={config.animation.stagger.enabled}
-                  onCheckedChange={(checked) => updateStagger("enabled", checked === true)}
+                  onCheckedChange={(checked) =>
+                    updateStagger("enabled", checked === true)
+                  }
                 />
-                <Label htmlFor="stagger-enabled">Enable Staggered Animation</Label>
+                <Label htmlFor="stagger-enabled">
+                  Enable Staggered Animation
+                </Label>
               </div>
 
               {config.animation.stagger.enabled && (
@@ -198,7 +230,9 @@ export default function ControlPanel({
                     <Label htmlFor="stagger-type">Stagger By</Label>
                     <Select
                       value={config.animation.stagger.type}
-                      onValueChange={(value) => updateStagger("type", value as StaggerType)}
+                      onValueChange={(value) =>
+                        updateStagger("type", value as StaggerType)
+                      }
                     >
                       <SelectTrigger id="stagger-type">
                         <SelectValue placeholder="Select stagger type" />
@@ -230,7 +264,9 @@ export default function ControlPanel({
             <Label htmlFor="animation-type">Animation Type</Label>
             <Select
               value={config.animation.type}
-              onValueChange={(value) => updateAnimation("type", value as "tween" | "spring")}
+              onValueChange={(value) =>
+                updateAnimation("type", value as "tween" | "spring")
+              }
             >
               <SelectTrigger id="animation-type">
                 <SelectValue placeholder="Select animation type" />
@@ -311,7 +347,10 @@ export default function ControlPanel({
 
               <div className="space-y-2">
                 <Label htmlFor="animation-ease">Easing Function</Label>
-                <Select value={config.animation.ease} onValueChange={(value) => updateAnimation("ease", value)}>
+                <Select
+                  value={config.animation.ease}
+                  onValueChange={(value) => updateAnimation("ease", value)}
+                >
                   <SelectTrigger id="animation-ease">
                     <SelectValue placeholder="Select easing" />
                   </SelectTrigger>
@@ -361,6 +400,5 @@ export default function ControlPanel({
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
-

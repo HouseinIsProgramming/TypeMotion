@@ -125,7 +125,6 @@ export default function TextContainerControls({
   return (
     <Card className="mb-4">
       <CardContent className="pt-4">
-        {/* ... (Top part with Title and Remove Button remains the same) ... */}
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-medium">Text Container</h3>
           {canRemove && (
@@ -140,7 +139,7 @@ export default function TextContainerControls({
           )}
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           {/* {text input thingy} */}
           <div className="space-y-2">
             <Label htmlFor={`text-content-${container.id}`}>Text Content</Label>
@@ -152,6 +151,7 @@ export default function TextContainerControls({
           </div>
           {/* {text input thingy end} */}
 
+          {/* font and text area container */}
           <div className="flex w-full gap-2 flex-col md:flex-row">
             {/* --- Font Family Command Popover --- */}
             <div className="space-y-2 flex-grow basis-1/2">
@@ -241,19 +241,22 @@ export default function TextContainerControls({
             unit="rem"
           />
 
-          <ColorPickerWithInput // text color light
-            id={`text-color-${container.id}`}
-            label="Text Color (Light)"
-            value={container.textColor}
-            onChange={(value) => handleUpdate({ textColor: value })}
-          />
+          {/* color picker div */}
+          <div className="flex gap-4 flex-col sm:flex-row *:basis-1/2 *:flex-grow">
+            <ColorPickerWithInput // text color light
+              id={`text-color-${container.id}`}
+              label="Text Color (Light)"
+              value={container.textColor}
+              onChange={(value) => handleUpdate({ textColor: value })}
+            />
 
-          <ColorPickerWithInput // text color dark
-            id={`text-color-dark-${container.id}`}
-            label="Text Color (Dark)"
-            value={container.textColorDark}
-            onChange={(value) => handleUpdate({ textColorDark: value })}
-          />
+            <ColorPickerWithInput // text color dark
+              id={`text-color-dark-${container.id}`}
+              label="Text Color (Dark)"
+              value={container.textColorDark}
+              onChange={(value) => handleUpdate({ textColorDark: value })}
+            />
+          </div>
 
           <SliderWithInput // margin top
             id={`margin-top-${container.id}`}
