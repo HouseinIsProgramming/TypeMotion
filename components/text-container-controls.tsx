@@ -140,7 +140,7 @@ export default function TextContainerControls({
         </div>
 
         <div className="space-y-4">
-          {/* ... (Text Content Input remains the same) ... */}
+          {/* {text input thingy} */}
           <div className="space-y-2">
             <Label htmlFor={`text-content-${container.id}`}>Text Content</Label>
             <Input
@@ -149,85 +149,87 @@ export default function TextContainerControls({
               onChange={(e) => handleUpdate({ text: e.target.value })}
             />
           </div>
+          {/* {text input thingy end} */}
 
-          {/* --- Font Family Command Popover --- */}
-          <div className="space-y-2">
-            <Label>Font Family</Label>
-            <Popover open={fontPopoverOpen} onOpenChange={setFontPopoverOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={fontPopoverOpen}
-                  className="w-full justify-between font-normal" // Use font-normal so button text doesn't change font
-                >
-                  {selectedFontLabel}
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                {" "}
-                {/* Use trigger width */}
-                <Command>
-                  <CommandInput placeholder="Search font..." />
-                  <CommandList>
-                    <CommandEmpty>No font found.</CommandEmpty>
-                    <CommandGroup>
-                      {fontOptions.map((font) => (
-                        <CommandItem
-                          key={font.value}
-                          value={font.value} // Value used for searching/matching
-                          onSelect={(currentValue) => {
-                            // currentValue is the 'value' of the selected item
-                            handleFontFamilyChange(currentValue);
-                            setFontPopoverOpen(false); // Close popover on select
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              container.fontFamily === font.value
-                                ? "opacity-100"
-                                : "opacity-0", // Show check only if selected
-                            )}
-                          />
-                          {font.label}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-          </div>
-          {/* --- End Font Family Command Popover --- */}
-
-          {/* --- Font Weight Select (remains the same) --- */}
-          <div className="space-y-2">
-            <Label htmlFor={`font-weight-${container.id}`}>Font Weight</Label>
-            <Select
-              value={container.fontWeight.toString()}
-              onValueChange={handleFontWeightChange}
-            >
-              <SelectTrigger id={`font-weight-${container.id}`}>
-                <SelectValue placeholder="Select weight" />
-              </SelectTrigger>
-              <SelectContent>
-                {fontWeightOptions.map((weight) => (
-                  <SelectItem
-                    key={weight.value}
-                    value={weight.value.toString()}
+          <div className="flex w-full gap-2 ">
+            {/* --- Font Family Command Popover --- */}
+            <div className="space-y-2 flex-grow basis-1/2">
+              <Label>Font Family</Label>
+              <Popover open={fontPopoverOpen} onOpenChange={setFontPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={fontPopoverOpen}
+                    className="w-full justify-between font-normal" // Use font-normal so button text doesn't change font
                   >
-                    {weight.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                    {selectedFontLabel}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                  {/* Use trigger width */}
+                  <Command>
+                    <CommandInput placeholder="Search font..." />
+                    <CommandList>
+                      <CommandEmpty>No font found.</CommandEmpty>
+                      <CommandGroup>
+                        {fontOptions.map((font) => (
+                          <CommandItem
+                            key={font.value}
+                            value={font.value} // Value used for searching/matching
+                            onSelect={(currentValue) => {
+                              // currentValue is the 'value' of the selected item
+                              handleFontFamilyChange(currentValue);
+                              setFontPopoverOpen(false); // Close popover on select
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                container.fontFamily === font.value
+                                  ? "opacity-100"
+                                  : "opacity-0", // Show check only if selected
+                              )}
+                            />
+                            {font.label}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
+            {/* command thingy end  */}
+
+            {/* --- Font Weight Select */}
+            <div className="space-y-2 flex-grow basis-1/2">
+              <Label htmlFor={`font-weight-${container.id}`}>Font Weight</Label>
+              <Select
+                value={container.fontWeight.toString()}
+                onValueChange={handleFontWeightChange}
+              >
+                <SelectTrigger id={`font-weight-${container.id}`}>
+                  <SelectValue placeholder="Select weight" />
+                </SelectTrigger>
+                <SelectContent>
+                  {fontWeightOptions.map((weight) => (
+                    <SelectItem
+                      key={weight.value}
+                      value={weight.value.toString()}
+                    >
+                      {weight.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {/* --- End Font Weight Select --- */}
           </div>
-          {/* --- End Font Weight Select --- */}
 
           {/* ... (Rest of the controls: FontSize, Colors, Margins, Delay remain the same) ... */}
-          <SliderWithInput
+          <SliderWithInput // font size
             id={`font-size-${container.id}`}
             label="Font Size"
             min={0.5}
@@ -238,33 +240,21 @@ export default function TextContainerControls({
             unit="rem"
           />
 
-          <Tabs defaultValue="light" className="w-full">
-            {/* ... Tabs content ... */}
-            <TabsList className="grid grid-cols-2 mb-2">
-              <TabsTrigger value="light">Light Mode</TabsTrigger>
-              <TabsTrigger value="dark">Dark Mode</TabsTrigger>
-            </TabsList>
+          <ColorPickerWithInput // text color light
+            id={`text-color-${container.id}`}
+            label="Text Color (Light)"
+            value={container.textColor}
+            onChange={(value) => handleUpdate({ textColor: value })}
+          />
 
-            <TabsContent value="light" className="space-y-4 pt-2">
-              <ColorPickerWithInput
-                id={`text-color-${container.id}`}
-                label="Text Color (Light)"
-                value={container.textColor}
-                onChange={(value) => handleUpdate({ textColor: value })}
-              />
-            </TabsContent>
+          <ColorPickerWithInput // text color dark
+            id={`text-color-dark-${container.id}`}
+            label="Text Color (Dark)"
+            value={container.textColorDark}
+            onChange={(value) => handleUpdate({ textColorDark: value })}
+          />
 
-            <TabsContent value="dark" className="space-y-4 pt-2">
-              <ColorPickerWithInput
-                id={`text-color-dark-${container.id}`}
-                label="Text Color (Dark)"
-                value={container.textColorDark}
-                onChange={(value) => handleUpdate({ textColorDark: value })}
-              />
-            </TabsContent>
-          </Tabs>
-
-          <SliderWithInput
+          <SliderWithInput // margin top
             id={`margin-top-${container.id}`}
             label="Margin Top"
             // ... props
@@ -276,7 +266,7 @@ export default function TextContainerControls({
             unit="px"
           />
 
-          <SliderWithInput
+          <SliderWithInput //margin botom
             id={`margin-bottom-${container.id}`}
             label="Margin Bottom"
             // ... props
@@ -288,7 +278,7 @@ export default function TextContainerControls({
             unit="px"
           />
 
-          <SliderWithInput
+          <SliderWithInput // anim. delay
             id={`delay-${container.id}`}
             label="Animation Delay"
             // ... props
